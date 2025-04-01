@@ -8,7 +8,6 @@ struct ContentView: View {
         ScrollView {
             LazyVStack {
                 ForEach(items, id: \.self) { item in
-                    
                     SwipeAction {
                         Text(item)
                             .padding(15)
