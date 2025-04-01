@@ -58,8 +58,7 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         let widthConstraint = indicator.widthAnchor.constraint(equalToConstant: rectWidth)
         widthConstraint.isActive = true
         context.coordinator.widthConstraint = widthConstraint
-
-        // Store the initial width in the coordinator
+        
         DispatchQueue.main.async {
             context.coordinator.hostItemInitWidth = container.frame.size.width
             hostItemInitWidth = container.frame.size.width
@@ -80,12 +79,10 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
     }
     
     func updateNSView(_ nsView: StatusIconContainerView, context: Context) {
-        // Update the content if needed
         if let hostingView = nsView.subviews.first as? NSHostingView<Content> {
             hostingView.rootView = content
         }
         
-        // Update the width constraint when rectWidth changes
         if let widthConstraint = context.coordinator.widthConstraint {
             widthConstraint.constant = rectWidth
         }
