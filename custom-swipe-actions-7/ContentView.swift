@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-@State private var items: [String] = Array(1...5).map(\.description)
+    @State private var items: [String] = Array(1...5).map(\.description)
     
     var body: some View {
         ScrollView {
