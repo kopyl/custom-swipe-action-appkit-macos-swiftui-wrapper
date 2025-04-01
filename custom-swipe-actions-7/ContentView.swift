@@ -96,6 +96,8 @@ class SwipeActionContainerView<Content: View>: NSView {
     var indicatorWidthConstraint: NSLayoutConstraint?
     private var eventMonitor: Any?
     private var hostItemInitWidth: CGFloat = 0
+    private var isRunningFullSwipe: Bool = false
+    private var isRunningFullSwipeFinished: Bool = false
 
     override init(frame: NSRect) {
         super.init(frame: frame)
@@ -124,13 +126,22 @@ class SwipeActionContainerView<Content: View>: NSView {
     override func mouseEntered(with event: NSEvent) {
         eventMonitor = NSEvent.addLocalMonitorForEvents(matching: [.scrollWheel]) { [weak self] val in
             guard let self = self else { return val }
+            guard self.isRunningFullSwipe == false else { return val }
+            
+            guard isRunningFullSwipeFinished == false else { return val }
 
             var changeTo = (self.indicatorWidthConstraint?.constant ?? 0) - val.scrollingDeltaX
             
             if changeTo > config.fullSwipeThreshold {
+                self.isRunningFullSwipe = true
+                
                 NSAnimationContext.runAnimationGroup { context in
                     context.duration = 0.05
                     self.indicatorWidthConstraint?.animator().constant = self.hostItemInitWidth
+                    NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .now)
+                } completionHandler: {
+                    self.isRunningFullSwipe = false
+                    self.isRunningFullSwipeFinished = true
                 }
                 return val
             }
@@ -166,6 +177,8 @@ class SwipeActionContainerView<Content: View>: NSView {
             NSEvent.removeMonitor(monitor)
             eventMonitor = nil
         }
+        
+        self.isRunningFullSwipeFinished = false
     }
 }
 
