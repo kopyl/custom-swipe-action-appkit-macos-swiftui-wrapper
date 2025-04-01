@@ -113,6 +113,11 @@ class StatusIconContainerView<Content: View>: NSView {
         eventMonitor = NSEvent.addLocalMonitorForEvents(matching: [.scrollWheel]) { [weak self] val in
             guard let self = self else { return val }
             
+            guard val.phase == .changed else {
+                hideSwipeActionToRight()
+                return val
+            }
+            
             var changeTo = (self.indicatorWidthConstraint?.constant ?? 0) - val.scrollingDeltaX
             if changeTo < 0 {
                 changeTo = 0
@@ -125,16 +130,20 @@ class StatusIconContainerView<Content: View>: NSView {
             return val
         }
     }
-
-    override func mouseExited(with event: NSEvent) {
+    
+    private func hideSwipeActionToRight() {
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.1
             indicatorWidthConstraint?.animator().constant = 0
+        }
+    }
 
-            if let monitor = eventMonitor {
-                NSEvent.removeMonitor(monitor)
-                eventMonitor = nil
-            }
+    override func mouseExited(with event: NSEvent) {
+        hideSwipeActionToRight()
+        
+        if let monitor = eventMonitor {
+            NSEvent.removeMonitor(monitor)
+            eventMonitor = nil
         }
     }
 }
