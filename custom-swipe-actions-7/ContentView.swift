@@ -35,7 +35,7 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
     }
     
     func makeNSView(context: Context) -> StatusIconContainerView<Content> {
-        let container = StatusIconContainerView<Content>()  // Corrected generic usage
+        let container = StatusIconContainerView<Content>()
         let hostingView = NSHostingView(rootView: content)
         hostingView.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(hostingView)
