@@ -66,8 +66,6 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         }
 
         NSEvent.addLocalMonitorForEvents(matching: [.scrollWheel]) { val in
-            print(context.coordinator.hostItemInitWidth)
-            
             rectWidth -= val.scrollingDeltaX
             if rectWidth < 0 {
                 rectWidth = 0
