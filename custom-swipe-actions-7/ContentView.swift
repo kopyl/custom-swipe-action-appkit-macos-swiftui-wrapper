@@ -33,8 +33,8 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         Coordinator(self)
     }
     
-    func makeNSView(context: Context) -> StatusIconContainerView<Content> {
-        let container = StatusIconContainerView<Content>()
+    func makeNSView(context: Context) -> SwipeActionContainerView<Content> {
+        let container = SwipeActionContainerView<Content>()
         let hostingView = NSHostingView(rootView: content)
         hostingView.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(hostingView)
@@ -66,7 +66,7 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         return container
     }
     
-    func updateNSView(_ nsView: StatusIconContainerView<Content>, context: Context) {
+    func updateNSView(_ nsView: SwipeActionContainerView<Content>, context: Context) {
         guard let hostingView = nsView.subviews.first as? NSHostingView<Content> else { return }
         hostingView.rootView = content
         
@@ -84,7 +84,7 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
     }
 }
 
-class StatusIconContainerView<Content: View>: NSView {
+class SwipeActionContainerView<Content: View>: NSView {
     var indicatorWidthConstraint: NSLayoutConstraint?
     private var eventMonitor: Any?
     private var hostItemInitWidth: CGFloat = 0
