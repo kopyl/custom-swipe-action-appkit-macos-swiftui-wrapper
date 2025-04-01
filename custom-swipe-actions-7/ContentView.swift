@@ -26,7 +26,7 @@ class SwipeActionConfig {
 
 struct SwipeAction<Content: View>: NSViewRepresentable {
     let content: Content
-    @State private var rectWidth: CGFloat = 0
+    @State private var swipeActionViewWidth: CGFloat = 0
 
     init(@ViewBuilder content: () -> Content) {
         self.content = content()
@@ -48,25 +48,26 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         let containerWidth = container.fittingSize.width
         let dynamicPadding = max((containerWidth - contentSize.width) / 2, 0)
 
-        let indicator = NSView()
-        indicator.translatesAutoresizingMaskIntoConstraints = false
-        indicator.wantsLayer = true
-        indicator.layer?.backgroundColor = NSColor.red.cgColor
-        container.addSubview(indicator)
+        let swipeActionView = NSView()
+        swipeActionView.translatesAutoresizingMaskIntoConstraints = false
+        swipeActionView.wantsLayer = true
+        swipeActionView.layer?.backgroundColor = NSColor.red.cgColor
+        container.addSubview(swipeActionView)
 
         NSLayoutConstraint.activate([
             hostingView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: dynamicPadding),
             hostingView.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -dynamicPadding),
             hostingView.topAnchor.constraint(equalTo: container.topAnchor, constant: dynamicPadding),
             hostingView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -dynamicPadding),
-            indicator.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-            indicator.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-            indicator.heightAnchor.constraint(equalTo: container.heightAnchor)
+
+            swipeActionView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            swipeActionView.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            swipeActionView.heightAnchor.constraint(equalTo: container.heightAnchor)
         ])
         
-        let widthConstraint = indicator.widthAnchor.constraint(equalToConstant: rectWidth)
-        widthConstraint.isActive = true
-        container.indicatorWidthConstraint = widthConstraint
+        let swipeActionViewWidthConstraint = swipeActionView.widthAnchor.constraint(equalToConstant: swipeActionViewWidth)
+        swipeActionViewWidthConstraint.isActive = true
+        container.swipeActionViewWidthConstraint = swipeActionViewWidthConstraint
         
         return container
     }
@@ -76,7 +77,7 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         hostingView.rootView = content
         
         guard let widthConstraint = context.coordinator.widthConstraint else { return }
-        widthConstraint.constant = rectWidth
+        widthConstraint.constant = swipeActionViewWidth
     }
     
     class Coordinator {
@@ -92,7 +93,7 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
 class SwipeActionContainerView<Content: View>: NSView {
     let config = SwipeActionConfig()
     
-    var indicatorWidthConstraint: NSLayoutConstraint?
+    var swipeActionViewWidthConstraint: NSLayoutConstraint?
     private var eventMonitor: Any?
     private var hostItemInitWidth: CGFloat = 0
     private var isRunningFullSwipe: Bool = false
@@ -129,14 +130,14 @@ class SwipeActionContainerView<Content: View>: NSView {
             
             guard isRunningFullSwipeFinished == false else { return val }
 
-            var changeTo = (self.indicatorWidthConstraint?.constant ?? 0) - val.scrollingDeltaX
+            var changeTo = (self.swipeActionViewWidthConstraint?.constant ?? 0) - val.scrollingDeltaX
             
             if changeTo > config.fullSwipeThreshold {
                 self.isRunningFullSwipe = true
                 
                 NSAnimationContext.runAnimationGroup { context in
                     context.duration = 0.05
-                    self.indicatorWidthConstraint?.animator().constant = self.hostItemInitWidth
+                    self.swipeActionViewWidthConstraint?.animator().constant = self.hostItemInitWidth
                     NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .now)
                 } completionHandler: {
                     self.isRunningFullSwipe = false
@@ -157,7 +158,7 @@ class SwipeActionContainerView<Content: View>: NSView {
                 changeTo = self.hostItemInitWidth
             }
             
-            self.indicatorWidthConstraint?.constant = changeTo
+            self.swipeActionViewWidthConstraint?.constant = changeTo
             return val
         }
     }
@@ -165,7 +166,7 @@ class SwipeActionContainerView<Content: View>: NSView {
     private func hideSwipeActionToRight() {
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.1
-            indicatorWidthConstraint?.animator().constant = 0
+            swipeActionViewWidthConstraint?.animator().constant = 0
         }
     }
 
