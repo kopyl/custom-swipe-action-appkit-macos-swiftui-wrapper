@@ -79,13 +79,11 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
     }
     
     func updateNSView(_ nsView: StatusIconContainerView, context: Context) {
-        if let hostingView = nsView.subviews.first as? NSHostingView<Content> {
-            hostingView.rootView = content
-        }
+        guard let hostingView = nsView.subviews.first as? NSHostingView<Content> else { return }
+        hostingView.rootView = content
         
-        if let widthConstraint = context.coordinator.widthConstraint {
-            widthConstraint.constant = rectWidth
-        }
+        guard let widthConstraint = context.coordinator.widthConstraint else { return }
+        widthConstraint.constant = rectWidth
     }
     
     class Coordinator {
