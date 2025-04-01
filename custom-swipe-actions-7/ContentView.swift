@@ -39,6 +39,8 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         hostingView.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(hostingView)
         
+        /// This calculation is needed because there is a padding on a wrapped View in SwiftUI,
+        /// then swipe action won't come to the very left of the screen
         let contentSize = hostingView.fittingSize
         let containerWidth = container.fittingSize.width
         let dynamicPadding = max((containerWidth - contentSize.width) / 2, 0)
