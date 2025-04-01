@@ -24,7 +24,6 @@ struct ContentView: View {
 struct SwipeAction<Content: View>: NSViewRepresentable {
     let content: Content
     @State private var rectWidth: CGFloat = 0
-    @State private var hostItemInitWidth: CGFloat = 0
 
     init(@ViewBuilder content: () -> Content) {
         self.content = content()
@@ -60,11 +59,6 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         widthConstraint.isActive = true
         container.indicatorWidthConstraint = widthConstraint
         
-        DispatchQueue.main.async {
-            context.coordinator.hostItemInitWidth = container.frame.size.width
-            hostItemInitWidth = container.frame.size.width
-        }
-        
         return container
     }
     
@@ -79,7 +73,6 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
     class Coordinator {
         var parent: SwipeAction
         var widthConstraint: NSLayoutConstraint?
-        var hostItemInitWidth: CGFloat = 0
         
         init(_ parent: SwipeAction) {
             self.parent = parent
