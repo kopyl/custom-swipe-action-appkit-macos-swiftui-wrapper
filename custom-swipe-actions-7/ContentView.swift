@@ -21,6 +21,10 @@ struct ContentView: View {
     }
 }
 
+class SwipeActionConfig {
+    let fullSwipeThreshold: CGFloat = 200
+}
+
 struct SwipeAction<Content: View>: NSViewRepresentable {
     let content: Content
     @State private var rectWidth: CGFloat = 0
@@ -87,6 +91,8 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
 }
 
 class SwipeActionContainerView<Content: View>: NSView {
+    let config = SwipeActionConfig()
+    
     var indicatorWidthConstraint: NSLayoutConstraint?
     private var eventMonitor: Any?
     private var hostItemInitWidth: CGFloat = 0
@@ -118,13 +124,22 @@ class SwipeActionContainerView<Content: View>: NSView {
     override func mouseEntered(with event: NSEvent) {
         eventMonitor = NSEvent.addLocalMonitorForEvents(matching: [.scrollWheel]) { [weak self] val in
             guard let self = self else { return val }
+
+            var changeTo = (self.indicatorWidthConstraint?.constant ?? 0) - val.scrollingDeltaX
+            
+            if changeTo > config.fullSwipeThreshold {
+                NSAnimationContext.runAnimationGroup { context in
+                    context.duration = 0.05
+                    self.indicatorWidthConstraint?.animator().constant = self.hostItemInitWidth
+                }
+                return val
+            }
             
             guard val.phase == .changed else {
                 hideSwipeActionToRight()
                 return val
             }
             
-            var changeTo = (self.indicatorWidthConstraint?.constant ?? 0) - val.scrollingDeltaX
             if changeTo < 0 {
                 changeTo = 0
             }
