@@ -11,7 +11,7 @@ struct ContentView: View {
                     
                     SwipeAction {
                         Text(item)
-                            .padding(10)
+                            .padding(15)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(.gray.opacity(0.2))
                     }
@@ -38,6 +38,10 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         let hostingView = NSHostingView(rootView: content)
         hostingView.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(hostingView)
+        
+        let contentSize = hostingView.fittingSize
+        let containerWidth = container.fittingSize.width
+        let dynamicPadding = max((containerWidth - contentSize.width) / 2, 0)
 
         let indicator = NSView()
         indicator.translatesAutoresizingMaskIntoConstraints = false
@@ -46,10 +50,10 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         container.addSubview(indicator)
 
         NSLayoutConstraint.activate([
-            hostingView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-            hostingView.trailingAnchor.constraint(equalTo: indicator.leadingAnchor),
-            hostingView.topAnchor.constraint(equalTo: container.topAnchor),
-            hostingView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            hostingView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: dynamicPadding),
+            hostingView.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -dynamicPadding),
+            hostingView.topAnchor.constraint(equalTo: container.topAnchor, constant: dynamicPadding),
+            hostingView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -dynamicPadding),
             indicator.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             indicator.centerYAnchor.constraint(equalTo: container.centerYAnchor),
             indicator.heightAnchor.constraint(equalTo: container.heightAnchor)
@@ -122,8 +126,8 @@ class StatusIconContainerView<Content: View>: NSView {
             if changeTo < 0 {
                 changeTo = 0
             }
-            if changeTo > self.hostItemInitWidth + 20 {
-                changeTo = self.hostItemInitWidth + 20
+            if changeTo > self.hostItemInitWidth {
+                changeTo = self.hostItemInitWidth
             }
             
             self.indicatorWidthConstraint?.constant = changeTo
