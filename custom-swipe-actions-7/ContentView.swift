@@ -67,7 +67,7 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
             hostingViewTrailingConstraint,
             hostingView.topAnchor.constraint(equalTo: container.topAnchor, constant: dynamicPadding),
             hostingView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -dynamicPadding),
-
+            
             swipeActionView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             swipeActionView.centerYAnchor.constraint(equalTo: container.centerYAnchor),
             swipeActionView.heightAnchor.constraint(equalTo: container.heightAnchor)
