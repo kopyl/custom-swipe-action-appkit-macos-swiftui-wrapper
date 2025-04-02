@@ -145,15 +145,15 @@ class SwipeActionContainerView<Content: View>: NSView {
     }
 
     override func mouseEntered(with event: NSEvent) {
-        eventMonitor = NSEvent.addLocalMonitorForEvents(matching: [.scrollWheel]) { [weak self] val in
-            guard let self = self else { return val }
-            guard self.isRunningFullSwipe == false else { return val }
+        eventMonitor = NSEvent.addLocalMonitorForEvents(matching: [.scrollWheel]) { [weak self] scrollWheelEvent in
+            guard let self = self else { return scrollWheelEvent }
+            guard self.isRunningFullSwipe == false else { return scrollWheelEvent }
             
-            guard isRunningFullSwipeFinished == false else { return val }
+            guard isRunningFullSwipeFinished == false else { return scrollWheelEvent }
 
-            var changeToWidthConstraint = (self.swipeActionViewWidthConstraint?.constant ?? 0) - val.scrollingDeltaX
-            var changeToLeadingConstraint = (self.hostingViewLeadingConstraint?.constant ?? 0) + val.scrollingDeltaX
-            var changeToTrailingConstraint = (self.hostingViewTrailingConstraint?.constant ?? 0) + val.scrollingDeltaX
+            var changeToWidthConstraint = (self.swipeActionViewWidthConstraint?.constant ?? 0) - scrollWheelEvent.scrollingDeltaX
+            var changeToLeadingConstraint = (self.hostingViewLeadingConstraint?.constant ?? 0) + scrollWheelEvent.scrollingDeltaX
+            var changeToTrailingConstraint = (self.hostingViewTrailingConstraint?.constant ?? 0) + scrollWheelEvent.scrollingDeltaX
             
             if changeToWidthConstraint > config.fullSwipeThreshold {
                 self.isRunningFullSwipe = true
@@ -170,12 +170,12 @@ class SwipeActionContainerView<Content: View>: NSView {
                     self.isRunningFullSwipe = false
                     self.isRunningFullSwipeFinished = true
                 }
-                return val
+                return scrollWheelEvent
             }
             
-            guard val.phase == .changed else {
+            guard scrollWheelEvent.phase == .changed else {
                 hideSwipeActionToRight()
-                return val
+                return scrollWheelEvent
             }
             
             if changeToWidthConstraint < 0 {
@@ -202,7 +202,7 @@ class SwipeActionContainerView<Content: View>: NSView {
             self.swipeActionViewWidthConstraint?.constant = changeToWidthConstraint
             self.hostingViewLeadingConstraint?.constant = changeToLeadingConstraint
             self.hostingViewTrailingConstraint?.constant = changeToTrailingConstraint
-            return val
+            return scrollWheelEvent
         }
     }
     
