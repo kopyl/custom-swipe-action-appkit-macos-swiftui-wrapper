@@ -58,11 +58,6 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         swipeActionView.layer?.backgroundColor = NSColor.red.cgColor
         container.addSubview(swipeActionView)
         
-        if let screen = container.window?.screen {
-            let screenRightAnchor = container.convert(screen.visibleFrame.origin, from: nil).x + screen.visibleFrame.width
-            hostingView.trailingAnchor.constraint(equalTo: container.leadingAnchor, constant: screenRightAnchor).isActive = true
-        }
-        
         let hostingViewLeadingConstraint = hostingView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: dynamicPadding)
         let hostingViewTrailingConstraint = hostingView.trailingAnchor.constraint(equalTo: container.trailingAnchor)
         
