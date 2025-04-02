@@ -9,7 +9,11 @@ struct ContentView: View {
             LazyVStack {
                 ForEach(items, id: \.self) { item in
                     SwipeAction {
-                        Text(item)
+                        HStack {
+                            Text(item)
+                            Spacer()
+                            Text(item)
+                        }
                             .padding(15)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(.gray.opacity(0.2))
