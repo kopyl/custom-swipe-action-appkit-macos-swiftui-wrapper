@@ -6,7 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		486122522D9CE04E008D6B23 /* SwipeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 486122502D9CE04A008D6B23 /* SwipeAction.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		486122502D9CE04A008D6B23 /* SwipeAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeAction.swift; sourceTree = "<group>"; };
 		4898BD292D9C706F00995D07 /* custom-swipe-actions-7.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "custom-swipe-actions-7.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -32,6 +37,7 @@
 		4898BD202D9C706F00995D07 = {
 			isa = PBXGroup;
 			children = (
+				486122502D9CE04A008D6B23 /* SwipeAction.swift */,
 				4898BD2B2D9C706F00995D07 /* custom-swipe-actions-7 */,
 				4898BD2A2D9C706F00995D07 /* Products */,
 			);
@@ -119,6 +125,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				486122522D9CE04E008D6B23 /* SwipeAction.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
