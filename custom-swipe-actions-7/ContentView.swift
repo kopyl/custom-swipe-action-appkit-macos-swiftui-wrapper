@@ -36,10 +36,6 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         self.content = content()
     }
     
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
     func makeNSView(context: Context) -> SwipeActionContainerView<Content> {
         let container = SwipeActionContainerView<Content>()
         let hostingView = NSHostingView(rootView: content)
@@ -74,34 +70,15 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         
         let swipeActionViewWidthConstraint = swipeActionView.widthAnchor.constraint(equalToConstant: swipeActionViewWidth)
         swipeActionViewWidthConstraint.isActive = true
+
         container.swipeActionViewWidthConstraint = swipeActionViewWidthConstraint
-        
         container.hostingViewLeadingConstraint = hostingViewLeadingConstraint
         container.hostingViewTrailingConstraint = hostingViewTrailingConstraint
-        context.coordinator.hostingViewLeadingConstraint = hostingViewLeadingConstraint
-        context.coordinator.hostingViewTrailingConstraint = hostingViewTrailingConstraint
         
         return container
     }
     
-    func updateNSView(_ nsView: SwipeActionContainerView<Content>, context: Context) {
-        guard let hostingView = nsView.subviews.first as? NSHostingView<Content> else { return }
-        hostingView.rootView = content
-        
-        guard let widthConstraint = context.coordinator.widthConstraint else { return }
-        widthConstraint.constant = swipeActionViewWidth
-    }
-    
-    class Coordinator {
-        var parent: SwipeAction
-        var widthConstraint: NSLayoutConstraint?
-        var hostingViewLeadingConstraint: NSLayoutConstraint?
-        var hostingViewTrailingConstraint: NSLayoutConstraint?
-        
-        init(_ parent: SwipeAction) {
-            self.parent = parent
-        }
-    }
+    func updateNSView(_ nsView: SwipeActionContainerView<Content>, context: Context) {}
 }
 
 class SwipeActionContainerView<Content: View>: NSView {
