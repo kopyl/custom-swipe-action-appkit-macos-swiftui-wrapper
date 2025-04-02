@@ -39,8 +39,8 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         
         let hostingViewLeadingConstraint = hostingView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: dynamicPadding)
         let hostingViewTrailingConstraint = hostingView.trailingAnchor.constraint(equalTo: container.trailingAnchor)
-        let swipeActionViewWidthConstraint = swipeActionView.widthAnchor.constraint(equalToConstant: swipeActionViewWidth)
         let swipeActionViewLeadingConstraint = swipeActionView.leadingAnchor.constraint(equalTo: hostingView.trailingAnchor, constant: self.spacing)
+        let swipeActionViewTrailingConstraint = swipeActionView.trailingAnchor.constraint(equalTo: swipeActionView.leadingAnchor, constant: swipeActionViewWidth)
         
         NSLayoutConstraint.activate([
             hostingViewLeadingConstraint,
@@ -48,13 +48,13 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
             hostingView.topAnchor.constraint(equalTo: container.topAnchor, constant: dynamicPadding),
             hostingView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -dynamicPadding),
             
-            swipeActionViewWidthConstraint,
             swipeActionViewLeadingConstraint,
+            swipeActionViewTrailingConstraint,
             swipeActionView.centerYAnchor.constraint(equalTo: container.centerYAnchor),
             swipeActionView.heightAnchor.constraint(equalTo: container.heightAnchor)
         ])
 
-        container.swipeActionViewWidthConstraint = swipeActionViewWidthConstraint
+        container.swipeActionViewTrailingConstraint = swipeActionViewTrailingConstraint
         container.swipeActionViewLeadingConstraint = swipeActionViewLeadingConstraint
         container.hostingViewLeadingConstraint = hostingViewLeadingConstraint
         container.hostingViewTrailingConstraint = hostingViewTrailingConstraint
@@ -69,7 +69,7 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
 class SwipeActionContainerView<Content: View>: NSView {
     let config = SwipeActionConfig()
     
-    var swipeActionViewWidthConstraint: NSLayoutConstraint?
+    var swipeActionViewTrailingConstraint: NSLayoutConstraint?
     var swipeActionViewLeadingConstraint: NSLayoutConstraint?
     
     var hostingViewLeadingConstraint: NSLayoutConstraint?
@@ -80,6 +80,14 @@ class SwipeActionContainerView<Content: View>: NSView {
     private var hostItemInitWidth: CGFloat = 0
     private var isRunningFullSwipe: Bool = false
     private var isRunningFullSwipeFinished: Bool = false
+    
+    // Added bounds to store calculation results
+    private var minWidthConstraint: CGFloat = 0
+    private var maxWidthConstraint: CGFloat = 0
+    private var minLeadingConstraint: CGFloat = 0
+    private var maxLeadingConstraint: CGFloat = 0
+    private var minTrailingConstraint: CGFloat = 0
+    private var maxTrailingConstraint: CGFloat = 0
 
     override init(frame: NSRect) {
         super.init(frame: frame)
@@ -88,6 +96,14 @@ class SwipeActionContainerView<Content: View>: NSView {
         
         DispatchQueue.main.async {
             self.hostItemInitWidth = self.bounds.width
+            
+            // Initialize bounds for constraints once we know the view size
+            self.minWidthConstraint = 0
+            self.maxWidthConstraint = self.hostItemInitWidth
+            self.minLeadingConstraint = -self.hostItemInitWidth
+            self.maxLeadingConstraint = 0
+            self.minTrailingConstraint = -self.hostItemInitWidth
+            self.maxTrailingConstraint = 0
         }
     }
 
@@ -106,23 +122,37 @@ class SwipeActionContainerView<Content: View>: NSView {
     }
 
     override func mouseEntered(with event: NSEvent) {
+        // We'll set up the event monitor only if it's not already set up
+        guard eventMonitor == nil else { return }
+        
         eventMonitor = NSEvent.addLocalMonitorForEvents(matching: [.scrollWheel]) { [weak self] scrollWheelEvent in
             guard let self = self else { return scrollWheelEvent }
-            guard self.isRunningFullSwipe == false else { return scrollWheelEvent }
+            guard !self.isRunningFullSwipe && !self.isRunningFullSwipeFinished else {
+                return scrollWheelEvent
+            }
             
-            guard isRunningFullSwipeFinished == false else { return scrollWheelEvent }
-
-            var changeToWidthConstraint = (self.swipeActionViewWidthConstraint?.constant ?? 0) - scrollWheelEvent.scrollingDeltaX
-            var changeToLeadingConstraint = (self.hostingViewLeadingConstraint?.constant ?? 0) + scrollWheelEvent.scrollingDeltaX
-            var changeToTrailingConstraint = (self.hostingViewTrailingConstraint?.constant ?? 0) + scrollWheelEvent.scrollingDeltaX
+            // Calculate the new constraint values based on the scroll delta
+            let deltaX = scrollWheelEvent.scrollingDeltaX
+            let newSwipeTrailingOffset = max(min((self.swipeActionViewTrailingConstraint?.constant ?? 0) - deltaX,
+                                               self.maxWidthConstraint),
+                                           self.minWidthConstraint)
             
-            if changeToWidthConstraint > config.fullSwipeThreshold {
+            let newLeadingConstraint = max(min((self.hostingViewLeadingConstraint?.constant ?? 0) + deltaX,
+                                             self.maxLeadingConstraint),
+                                         self.minLeadingConstraint)
+            
+            let newTrailingConstraint = max(min((self.hostingViewTrailingConstraint?.constant ?? 0) + deltaX,
+                                              self.maxTrailingConstraint),
+                                          self.minTrailingConstraint)
+            
+            // Check if we've reached the full swipe threshold
+            if newSwipeTrailingOffset > self.config.fullSwipeThreshold {
                 self.isRunningFullSwipe = true
                 
                 NSAnimationContext.runAnimationGroup { animation in
                     animation.duration = self.config.fullSwipeAnimationDuration
                     
-                    self.swipeActionViewWidthConstraint?.animator().constant = self.hostItemInitWidth
+                    self.swipeActionViewTrailingConstraint?.animator().constant = self.hostItemInitWidth
                     self.hostingViewLeadingConstraint?.animator().constant = -self.hostItemInitWidth
                     self.hostingViewTrailingConstraint?.animator().constant = -self.hostItemInitWidth
                     
@@ -136,35 +166,17 @@ class SwipeActionContainerView<Content: View>: NSView {
                 return scrollWheelEvent
             }
             
+            // If scroll phase isn't "changed", we're done with the swipe, reset
             guard scrollWheelEvent.phase == .changed else {
-                hideSwipeActionToRight()
+                self.hideSwipeActionToRight()
                 return scrollWheelEvent
             }
             
-            if changeToWidthConstraint < 0 {
-                changeToWidthConstraint = 0
-            }
-            if changeToWidthConstraint > self.hostItemInitWidth {
-                changeToWidthConstraint = self.hostItemInitWidth
-            }
+            // Apply the new constraint values
+            self.swipeActionViewTrailingConstraint?.constant = newSwipeTrailingOffset
+            self.hostingViewLeadingConstraint?.constant = newLeadingConstraint
+            self.hostingViewTrailingConstraint?.constant = newTrailingConstraint
             
-            if changeToTrailingConstraint > 0 {
-                changeToTrailingConstraint = 0
-            }
-            if changeToTrailingConstraint < -self.hostItemInitWidth {
-                changeToTrailingConstraint = -self.hostItemInitWidth
-            }
-            
-            if changeToLeadingConstraint > 0 {
-                changeToLeadingConstraint = 0
-            }
-            if changeToLeadingConstraint < -self.hostItemInitWidth {
-                changeToLeadingConstraint = -self.hostItemInitWidth
-            }
-            
-            self.swipeActionViewWidthConstraint?.constant = changeToWidthConstraint
-            self.hostingViewLeadingConstraint?.constant = changeToLeadingConstraint
-            self.hostingViewTrailingConstraint?.constant = changeToTrailingConstraint
             return scrollWheelEvent
         }
     }
@@ -173,7 +185,7 @@ class SwipeActionContainerView<Content: View>: NSView {
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.1
             
-            swipeActionViewWidthConstraint?.animator().constant = 0
+            swipeActionViewTrailingConstraint?.animator().constant = 0
             hostingViewLeadingConstraint?.animator().constant = 0
             hostingViewTrailingConstraint?.animator().constant = 0
         }
