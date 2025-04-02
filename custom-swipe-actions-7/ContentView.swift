@@ -26,6 +26,7 @@ struct ContentView: View {
 
 class SwipeActionConfig {
     let fullSwipeThreshold: CGFloat = 200
+    let fullSwipeAnimationDuration: CGFloat = 0.05
 }
 
 struct SwipeAction<Content: View>: NSViewRepresentable {
@@ -130,7 +131,7 @@ class SwipeActionContainerView<Content: View>: NSView {
                 self.isRunningFullSwipe = true
                 
                 NSAnimationContext.runAnimationGroup { animation in
-                    animation.duration = 0.05
+                    animation.duration = self.config.fullSwipeAnimationDuration
                     
                     self.swipeActionViewWidthConstraint?.animator().constant = self.hostItemInitWidth
                     self.hostingViewLeadingConstraint?.animator().constant = -self.hostItemInitWidth
