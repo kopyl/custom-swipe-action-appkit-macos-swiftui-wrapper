@@ -158,8 +158,8 @@ class SwipeActionContainerView<Content: View>: NSView {
             if changeToWidthConstraint > config.fullSwipeThreshold {
                 self.isRunningFullSwipe = true
                 
-                NSAnimationContext.runAnimationGroup { context in
-                    context.duration = 0.05
+                NSAnimationContext.runAnimationGroup { animation in
+                    animation.duration = 0.05
                     
                     self.swipeActionViewWidthConstraint?.animator().constant = self.hostItemInitWidth
                     self.hostingViewLeadingConstraint?.animator().constant = -self.hostItemInitWidth
