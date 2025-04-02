@@ -7,7 +7,7 @@ struct ContentView: View {
         ScrollView {
             LazyVStack {
                 ForEach(items, id: \.self) { item in
-                    SwipeAction {
+                    SwipeAction(spacing: 10) {
                         HStack {
                             Text(item)
                             Spacer()

@@ -6,10 +6,16 @@ class SwipeActionConfig {
 }
 
 struct SwipeAction<Content: View>: NSViewRepresentable {
+    var spacing: CGFloat = 0
     let content: Content
     private var swipeActionViewWidth: CGFloat = 0
 
     init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+    
+    init(spacing: CGFloat, @ViewBuilder content: () -> Content) {
+        self.spacing = spacing
         self.content = content()
     }
     
@@ -34,6 +40,7 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         let hostingViewLeadingConstraint = hostingView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: dynamicPadding)
         let hostingViewTrailingConstraint = hostingView.trailingAnchor.constraint(equalTo: container.trailingAnchor)
         let swipeActionViewWidthConstraint = swipeActionView.widthAnchor.constraint(equalToConstant: swipeActionViewWidth)
+        let swipeActionViewLeadingConstraint = swipeActionView.leadingAnchor.constraint(equalTo: hostingView.trailingAnchor, constant: self.spacing)
         
         NSLayoutConstraint.activate([
             hostingViewLeadingConstraint,
@@ -42,14 +49,16 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
             hostingView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -dynamicPadding),
             
             swipeActionViewWidthConstraint,
-            swipeActionView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            swipeActionViewLeadingConstraint,
             swipeActionView.centerYAnchor.constraint(equalTo: container.centerYAnchor),
             swipeActionView.heightAnchor.constraint(equalTo: container.heightAnchor)
         ])
 
         container.swipeActionViewWidthConstraint = swipeActionViewWidthConstraint
+        container.swipeActionViewLeadingConstraint = swipeActionViewLeadingConstraint
         container.hostingViewLeadingConstraint = hostingViewLeadingConstraint
         container.hostingViewTrailingConstraint = hostingViewTrailingConstraint
+        container.spacing = self.spacing
         
         return container
     }
@@ -61,8 +70,12 @@ class SwipeActionContainerView<Content: View>: NSView {
     let config = SwipeActionConfig()
     
     var swipeActionViewWidthConstraint: NSLayoutConstraint?
+    var swipeActionViewLeadingConstraint: NSLayoutConstraint?
+    
     var hostingViewLeadingConstraint: NSLayoutConstraint?
     var hostingViewTrailingConstraint: NSLayoutConstraint?
+    var spacing: CGFloat = 0
+    
     private var eventMonitor: Any?
     private var hostItemInitWidth: CGFloat = 0
     private var isRunningFullSwipe: Bool = false
@@ -112,6 +125,8 @@ class SwipeActionContainerView<Content: View>: NSView {
                     self.swipeActionViewWidthConstraint?.animator().constant = self.hostItemInitWidth
                     self.hostingViewLeadingConstraint?.animator().constant = -self.hostItemInitWidth
                     self.hostingViewTrailingConstraint?.animator().constant = -self.hostItemInitWidth
+                    
+                    self.swipeActionViewLeadingConstraint?.animator().constant = 0
                     
                     NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .now)
                 } completionHandler: {
@@ -173,5 +188,6 @@ class SwipeActionContainerView<Content: View>: NSView {
         }
         
         self.isRunningFullSwipeFinished = false
+        self.swipeActionViewLeadingConstraint?.animator().constant = self.spacing
     }
 }
