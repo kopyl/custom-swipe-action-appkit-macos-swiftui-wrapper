@@ -30,7 +30,7 @@ class SwipeActionConfig {
 
 struct SwipeAction<Content: View>: NSViewRepresentable {
     let content: Content
-    @State private var swipeActionViewWidth: CGFloat = 0
+    private var swipeActionViewWidth: CGFloat = 0
 
     init(@ViewBuilder content: () -> Content) {
         self.content = content()
@@ -56,6 +56,7 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         
         let hostingViewLeadingConstraint = hostingView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: dynamicPadding)
         let hostingViewTrailingConstraint = hostingView.trailingAnchor.constraint(equalTo: container.trailingAnchor)
+        let swipeActionViewWidthConstraint = swipeActionView.widthAnchor.constraint(equalToConstant: swipeActionViewWidth)
         
         NSLayoutConstraint.activate([
             hostingViewLeadingConstraint,
@@ -63,13 +64,11 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
             hostingView.topAnchor.constraint(equalTo: container.topAnchor, constant: dynamicPadding),
             hostingView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -dynamicPadding),
             
+            swipeActionViewWidthConstraint,
             swipeActionView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             swipeActionView.centerYAnchor.constraint(equalTo: container.centerYAnchor),
             swipeActionView.heightAnchor.constraint(equalTo: container.heightAnchor)
         ])
-        
-        let swipeActionViewWidthConstraint = swipeActionView.widthAnchor.constraint(equalToConstant: swipeActionViewWidth)
-        swipeActionViewWidthConstraint.isActive = true
 
         container.swipeActionViewWidthConstraint = swipeActionViewWidthConstraint
         container.hostingViewLeadingConstraint = hostingViewLeadingConstraint
