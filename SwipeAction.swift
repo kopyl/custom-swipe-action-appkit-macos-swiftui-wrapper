@@ -93,6 +93,7 @@ class SwipeActionContainerView<Content: View>: NSView {
     private var hostItemInitWidth: CGFloat = 0
     private var isRunningFullSwipe: Bool = false
     private var isRunningFullSwipeFinished: Bool = false
+    private var trackingArea: NSTrackingArea?
 
     override init(frame: NSRect) {
         super.init(frame: frame)
@@ -110,16 +111,14 @@ class SwipeActionContainerView<Content: View>: NSView {
     }
 
     private func addTrackingArea() {
-        let trackingArea = NSTrackingArea(
-            rect: self.bounds,
-            options: [.mouseMoved, .mouseEnteredAndExited, .activeAlways, .inVisibleRect],
-            owner: self,
-            userInfo: nil
-        )
-        self.addTrackingArea(trackingArea)
+        let options: NSTrackingArea.Options = [.mouseEnteredAndExited, .activeAlways, .inVisibleRect]
+        trackingArea = NSTrackingArea(rect: self.bounds, options: options, owner: self, userInfo: nil)
+        self.addTrackingArea(trackingArea!)
     }
 
     override func mouseEntered(with event: NSEvent) {
+        guard eventMonitor == nil else { return }
+            
         eventMonitor = NSEvent.addLocalMonitorForEvents(matching: [.scrollWheel]) { [weak self] scrollWheelEvent in
             guard let self = self else { return scrollWheelEvent }
             guard self.isRunningFullSwipe == false else { return scrollWheelEvent }
