@@ -126,7 +126,7 @@ class SwipeActionContainerView<Content: View>: NSView {
             
             guard isRunningFullSwipeFinished == false else { return scrollWheelEvent }
             
-            let changeToLeadingConstraintHost = (self.hostingViewTrailingConstraint?.constant ?? 0) + scrollWheelEvent.scrollingDeltaX
+            var changeToLeadingConstraintHost = (self.hostingViewTrailingConstraint?.constant ?? 0) + scrollWheelEvent.scrollingDeltaX
             
             var changeToTrailingConstraintHost = (self.hostingViewTrailingConstraint?.constant ?? 0) + scrollWheelEvent.scrollingDeltaX
             
@@ -160,6 +160,10 @@ class SwipeActionContainerView<Content: View>: NSView {
             if changeToTrailingConstraintHost > 0 {
                 changeToTrailingConstraintHost = 0
             }
+            if changeToLeadingConstraintHost > 0 {
+                changeToLeadingConstraintHost = 0
+            }
+
             if changeToTrailingConstraintHost < -self.hostItemInitWidth {
                 changeToTrailingConstraintHost = -self.hostItemInitWidth
             }
