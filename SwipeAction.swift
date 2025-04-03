@@ -132,7 +132,7 @@ class SwipeActionContainerView<Content: View>: NSView {
                     animation.duration = self.config.fullSwipeAnimationDuration
                     
                     self.swipeActionViewLeadingConstraint?.animator().constant = -self.hostItemInitWidth
-                    self.swipeActionViewTrailingConstraint?.animator().constant = 1000
+                    self.swipeActionViewTrailingConstraint?.animator().constant = 0
                     
                     self.hostingViewLeadingConstraint?.animator().constant = -self.hostItemInitWidth
                     self.hostingViewTrailingConstraint?.animator().constant = -self.hostItemInitWidth
