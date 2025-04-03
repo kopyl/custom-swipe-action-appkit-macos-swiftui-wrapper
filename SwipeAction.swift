@@ -109,7 +109,7 @@ class SwipeActionContainerView<Content: View>: NSView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     private func addTrackingArea() {
         let options: NSTrackingArea.Options = [.mouseEnteredAndExited, .activeAlways, .inVisibleRect]
         trackingArea = NSTrackingArea(rect: self.bounds, options: options, owner: self, userInfo: nil)
@@ -130,7 +130,7 @@ class SwipeActionContainerView<Content: View>: NSView {
             var changeToTrailingConstraintHost = (self.hostingViewTrailingConstraint?.constant ?? 0) + scrollWheelEvent.scrollingDeltaX
             
             var changeToLeadingConstraintSwipe: CGFloat = (self.swipeActionViewLeadingConstraint?.constant ?? 0) + scrollWheelEvent.scrollingDeltaX
-
+            
             if -changeToLeadingConstraintSwipe > config.fullSwipeThreshold {
                 self.isRunningFullSwipe = true
                 
@@ -161,7 +161,7 @@ class SwipeActionContainerView<Content: View>: NSView {
             if changeToLeadingConstraintHost > 0 {
                 changeToLeadingConstraintHost = 0
             }
-
+            
             if changeToTrailingConstraintHost < -self.hostItemInitWidth {
                 changeToTrailingConstraintHost = -self.hostItemInitWidth
             }
