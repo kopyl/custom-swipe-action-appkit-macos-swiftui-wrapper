@@ -8,6 +8,7 @@ class SwipeActionConfig {
 struct SwipeAction<Content: View>: NSViewRepresentable {
     var spacing: CGFloat = 0
     var horizontalInset: CGFloat = 0
+    var cornerRadius: CGFloat = 0
     
     let content: Content
     private var swipeActionViewWidth: CGFloat = 0
@@ -19,10 +20,13 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
     init(
         spacing: CGFloat = 0,
         horizontalInset: CGFloat = 0,
+        cornerRadius: CGFloat = 0,
         @ViewBuilder content: () -> Content
     ) {
         self.spacing = spacing
         self.horizontalInset = horizontalInset
+        self.cornerRadius = cornerRadius
+        
         self.content = content()
     }
     
@@ -42,6 +46,8 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         swipeActionView.translatesAutoresizingMaskIntoConstraints = false
         swipeActionView.wantsLayer = true
         swipeActionView.layer?.backgroundColor = NSColor.red.cgColor
+        swipeActionView.layer?.cornerRadius = cornerRadius
+        
         container.addSubview(swipeActionView)
         
         let hostingViewLeadingConstraint = hostingView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: dynamicPadding)
