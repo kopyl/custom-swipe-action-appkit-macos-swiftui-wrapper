@@ -1,7 +1,7 @@
 import SwiftUI
 
 class SwipeActionConfig {
-    let fullSwipeThreshold: CGFloat = 200
+    let fullSwipeThreshold: CGFloat = 300
     let fullSwipeAnimationDuration: CGFloat = 0.05
 }
 
