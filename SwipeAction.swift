@@ -14,7 +14,7 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         self.content = content()
     }
     
-    init(spacing: CGFloat, @ViewBuilder content: () -> Content) {
+    init(spacing: CGFloat = 0, @ViewBuilder content: () -> Content) {
         self.spacing = spacing
         self.content = content()
     }
