@@ -152,10 +152,7 @@ class SwipeActionContainerView<Content: View>: NSView {
                 } completionHandler: {
                     self.isRunningFullSwipe = false
                     self.isRunningFullSwipeFinished = true
-                    
-                    if let fullSwipeFunction = self.onFullSwipe {
-                        fullSwipeFunction()
-                    }
+                    self.onFullSwipe?()
                 }
                 return scrollWheelEvent
             }
