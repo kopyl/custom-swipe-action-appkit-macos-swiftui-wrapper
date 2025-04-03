@@ -139,7 +139,6 @@ class SwipeActionContainerView<Content: View>: NSView {
                     animation.duration = self.config.fullSwipeAnimationDuration
                     
                     self.swipeActionViewLeadingConstraint?.animator().constant = -self.hostItemInitWidth
-                    self.swipeActionViewTrailingConstraint?.animator().constant = 0
                     
                     self.hostingViewLeadingConstraint?.animator().constant = -self.hostItemInitWidth
                     self.hostingViewTrailingConstraint?.animator().constant = -self.hostItemInitWidth
@@ -176,7 +175,6 @@ class SwipeActionContainerView<Content: View>: NSView {
             self.hostingViewTrailingConstraint?.constant = changeToTrailingConstraintHost
             
             self.swipeActionViewLeadingConstraint?.constant = changeToLeadingConstraintSwipe
-            self.swipeActionViewTrailingConstraint?.constant = 0
             
             return scrollWheelEvent
         }
@@ -190,7 +188,6 @@ class SwipeActionContainerView<Content: View>: NSView {
             hostingViewTrailingConstraint?.animator().constant = 0
             
             swipeActionViewLeadingConstraint?.animator().constant = 0 + self.spacing
-            swipeActionViewTrailingConstraint?.animator().constant = 0
         }
     }
 
