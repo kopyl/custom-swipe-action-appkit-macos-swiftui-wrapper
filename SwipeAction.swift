@@ -40,7 +40,6 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         let hostingViewLeadingConstraint = hostingView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: dynamicPadding)
         let hostingViewTrailingConstraint = hostingView.trailingAnchor.constraint(equalTo: container.trailingAnchor)
         
-
         let swipeActionViewLeadingConstraint = swipeActionView.leadingAnchor.constraint(equalTo: container.trailingAnchor, constant: self.spacing)
         let swipeActionViewTrailingConstraint = swipeActionView.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: self.spacing)
         
@@ -163,8 +162,6 @@ class SwipeActionContainerView<Content: View>: NSView {
             
             self.swipeActionViewLeadingConstraint?.constant = changeToLeadingConstraintSwipe
             self.swipeActionViewTrailingConstraint?.constant = 0
-            
-            
             
             return scrollWheelEvent
         }
