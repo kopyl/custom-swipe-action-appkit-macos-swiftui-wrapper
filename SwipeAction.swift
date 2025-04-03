@@ -78,6 +78,7 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
     func updateNSView(_ nsView: SwipeActionContainerView<Content>, context: Context) {
         guard let hostingView = nsView.subviews.compactMap({ $0 as? NSHostingView<Content> }).first else { return }
         hostingView.rootView = content
+        hostingView.layout()
     }
 }
 
