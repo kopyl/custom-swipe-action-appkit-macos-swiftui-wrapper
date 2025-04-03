@@ -11,10 +11,6 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
     
     let content: Content
     private var swipeActionViewWidth: CGFloat = 0
-
-    init(@ViewBuilder content: () -> Content) {
-        self.content = content()
-    }
     
     init(
         spacing: CGFloat = 0,
