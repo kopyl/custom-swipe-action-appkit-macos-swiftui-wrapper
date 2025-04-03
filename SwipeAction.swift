@@ -7,6 +7,7 @@ class SwipeActionConfig {
 
 struct SwipeAction<Content: View>: NSViewRepresentable {
     var spacing: CGFloat = 0
+    var horizontalInset: CGFloat = 0
     let content: Content
     private var swipeActionViewWidth: CGFloat = 0
 
@@ -14,8 +15,9 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         self.content = content()
     }
     
-    init(spacing: CGFloat = 0, @ViewBuilder content: () -> Content) {
+    init(spacing: CGFloat = 0, horizontalInset: CGFloat = 0, @ViewBuilder content: () -> Content) {
         self.spacing = spacing
+        self.horizontalInset = horizontalInset
         self.content = content()
     }
     
@@ -61,6 +63,7 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         container.hostingViewLeadingConstraint = hostingViewLeadingConstraint
         container.hostingViewTrailingConstraint = hostingViewTrailingConstraint
         container.spacing = self.spacing
+        container.horizontalInset = self.horizontalInset
         
         return container
     }
@@ -78,6 +81,7 @@ class SwipeActionContainerView<Content: View>: NSView {
     var hostingViewTrailingConstraint: NSLayoutConstraint?
     
     var spacing: CGFloat = 0
+    var horizontalInset: CGFloat = 0
     
     private var eventMonitor: Any?
     private var hostItemInitWidth: CGFloat = 0
