@@ -95,6 +95,7 @@ class SwipeActionContainerView<Content: View>: NSView {
         
         DispatchQueue.main.async {
             self.hostItemInitWidth = self.bounds.width
+            self.clipsToBounds = true
         }
     }
 
