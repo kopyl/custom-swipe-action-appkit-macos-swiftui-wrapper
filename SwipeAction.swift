@@ -10,7 +10,6 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
     var cornerRadius: CGFloat = 0
     
     let content: Content
-    private var swipeActionViewWidth: CGFloat = 0
     
     var onFullSwipe: (() -> Void)? = nil
     
