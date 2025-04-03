@@ -7,7 +7,7 @@ struct ContentView: View {
         ScrollView {
             LazyVStack {
                 ForEach(items, id: \.self) { item in
-                    SwipeAction(spacing: 10, cornerRadius: 4) {
+                    SwipeAction {
                         HStack {
                             Text(item)
                             Spacer()
@@ -17,6 +17,8 @@ struct ContentView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(.gray.opacity(0.2))
                             .cornerRadius(4)
+                    } onFullSwipe: {
+                        print("Swiped full")
                     }
                     .cornerRadius(4)
                     .padding(.horizontal, 10)

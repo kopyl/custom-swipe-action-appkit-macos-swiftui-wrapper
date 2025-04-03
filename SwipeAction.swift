@@ -12,15 +12,19 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
     let content: Content
     private var swipeActionViewWidth: CGFloat = 0
     
+    var onFullSwipe: (() -> Void)? = nil
+    
     init(
         spacing: CGFloat = 0,
         cornerRadius: CGFloat = 0,
-        @ViewBuilder content: () -> Content
+        @ViewBuilder content: () -> Content,
+        onFullSwipe: (() -> Void)? = nil
     ) {
         self.spacing = spacing
         self.cornerRadius = cornerRadius
         
         self.content = content()
+        self.onFullSwipe = onFullSwipe
     }
     
     func makeNSView(context: Context) -> SwipeActionContainerView<Content> {
@@ -67,6 +71,7 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
         container.hostingViewLeadingConstraint = hostingViewLeadingConstraint
         container.hostingViewTrailingConstraint = hostingViewTrailingConstraint
         container.spacing = self.spacing
+        container.onFullSwipe = onFullSwipe
         
         return container
     }
@@ -79,6 +84,8 @@ struct SwipeAction<Content: View>: NSViewRepresentable {
 
 class SwipeActionContainerView<Content: View>: NSView {
     let config = SwipeActionConfig()
+
+    var onFullSwipe: (() -> Void)? = nil
     
     var swipeActionViewLeadingConstraint: NSLayoutConstraint?
     var swipeActionViewTrailingConstraint: NSLayoutConstraint?
@@ -145,6 +152,10 @@ class SwipeActionContainerView<Content: View>: NSView {
                 } completionHandler: {
                     self.isRunningFullSwipe = false
                     self.isRunningFullSwipeFinished = true
+                    
+                    if let fullSwipeFunction = self.onFullSwipe {
+                        fullSwipeFunction()
+                    }
                 }
                 return scrollWheelEvent
             }
@@ -190,12 +201,14 @@ class SwipeActionContainerView<Content: View>: NSView {
     }
 
     override func mouseExited(with event: NSEvent) {
-        hideSwipeActionToRight()
-        
         if let monitor = eventMonitor {
             NSEvent.removeMonitor(monitor)
             eventMonitor = nil
         }
+        
+        guard self.onFullSwipe == nil else { return }
+        
+        hideSwipeActionToRight()
         
         self.isRunningFullSwipeFinished = false
         
